@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Форма регистрации</h2>
+<input type="text" id="username" placeholder="Введите имя пользователя"><br>
+<input type="password" id="password" placeholder="Введите пароль"><br>
+<button onclick="submitRegistration()">Зарегистрироваться</button>
+
+<script>
+  function submitRegistration() {
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    var jsonData = JSON.stringify({ username: username, password: password });
+  
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:8000/reg/";
+  
+    // Fetch the CSRF token from the cookie
+    var csrftoken = getCookie('csrftoken');
+  
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    // Add the CSRF token to the request header
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.send(jsonData);
+  }
+  
+  // Function to get the CSRF token from the cookie
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        // Get the CSRF token from the cookie
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+</script>
+
+</body>
+</html>
