@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <body>
-
 <h2>Форма регистрации</h2>
 <input type="text" id="username" placeholder="Введите имя пользователя"><br>
 <input type="password" id="password" placeholder="Введите пароль"><br>
@@ -23,17 +22,27 @@
     xhr.setRequestHeader("Content-Type", "application/json");
     // Add the CSRF token to the request header
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
+  
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var response = xhr.responseText;
+        if (response === 'True') {
+          window.location.href = 'http://127.0.0.1:8000';
+        }
+      }
+    };
+  
     xhr.send(jsonData);
   }
   
+  
   // Function to get the CSRF token from the cookie
   function getCookie(name) {
-    var cookieValue = null;
+    let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        // Get the CSRF token from the cookie
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
         if (cookie.substring(0, name.length + 1) === (name + '=')) {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
@@ -42,6 +51,7 @@
     }
     return cookieValue;
   }
+  
   
 </script>
 

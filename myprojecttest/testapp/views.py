@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 import json
+from django.http import HttpResponse
 
 def home(request):
     if request.user.is_authenticated:
-        return HttpResponse('Вы зарегестрированны')
+        return render(request, 'yes_reg.html', {'username': request.session.get('username', None)})
     else:
-        return render(request, 'home.html')
+        return render(request, 'no_reg.html')
 
 def reg(request):
     if request.method == 'GET':
@@ -20,4 +20,5 @@ def reg(request):
         user = User.objects.create_user(username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            request.session['username'] = username
+            return HttpResponse('True')
