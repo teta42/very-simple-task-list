@@ -1,3 +1,6 @@
 from django.db import models
 
-# Create your models here.
+class task(models.Model):
+    text = models.TextField()
+    status = models.CharField(max_length=13)
+    date_creation = models.DateTimeField(auto_now=True)
