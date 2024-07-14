@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=K2D&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'K2D', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <input type="text" id="taskInput">
+  <button onclick="sendTask()">Отправить</button>
+  <div id="taskList"></div>
+
+  <script>
+    function sendTask() {
+      let taskText = document.getElementById('taskInput').value;
+      fetch('http://127.0.0.1:8000/options/new_task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: taskText })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('taskInput').value = '';
+      });
+    }
+
+    window.onload = function() {
+      fetch('http://127.0.0.1:8000/options/list_task')
+      .then(response => response.json())
+      .then(data => {
+        let taskList = document.getElementById('taskList');
+        for (let key in data) {
+          let task = data[key];
+          let taskLine = document.createElement('div');
+          taskLine.textContent = `${task.status}: ${task.text} - ${task.date}`;
+          taskList.appendChild(taskLine);
+        }
+      });
+    }
+
+    function changeStatus(taskId) {
+      // Здесь нужно добавить логику для отображения списка возможных состояний и отправки POST запроса на http://127.0.0.1:8000/options/change_task
+  	  // Примерно так:
+      let newStatus = prompt('Выберите новый статус: новое, решенное, нерешенное, заброшенное');
+      if (newStatus) {
+          fetch('http://127.0.0.1:8000/options/change_task', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Логика для обновления отображаемых данных после изменения статуса
+            });
+        }
+}
+
+    function deleteTask(taskId) {
+      // Здесь нужно добавить логику для отправки POST запроса на http://127.0.0.1:8000/options/delete_task с ключом задачи
+      // Примерно так:
+      fetch('http://127.0.0.1:8000/options/delete_task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ taskId: taskId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Логика для обновления отображаемых данных после удаления задачи
+      });
+}
+  </script>
+</body>
+</html>
