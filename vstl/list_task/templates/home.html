@@ -35,48 +35,94 @@
       .then(response => response.json())
       .then(data => {
         let taskList = document.getElementById('taskList');
-        for (let key in data) {
+        let reversedKeys = Object.keys(data).reverse();  // Разворачиваем ключи
+        for (let key of reversedKeys) {
           let task = data[key];
           let taskLine = document.createElement('div');
           taskLine.textContent = `${task.status}: ${task.text} - ${task.date}`;
+          let changeStatusButton = document.createElement('button');
+          changeStatusButton.textContent = 'Change Status';
+          changeStatusButton.onclick = function() {
+            changeStatus(key, task.id); // Передаем идентификатор задачи в функцию changeStatus
+          };
+          let deleteButton = document.createElement('button');  // Создаем кнопку удаления
+          deleteButton.textContent = 'Delete';  // Текст кнопки
+          deleteButton.onclick = function() {
+            deleteTask(key, task.id);  // Вызываем функцию deleteTask с идентификатором задачи
+          };
+          taskLine.appendChild(changeStatusButton);
+          taskLine.appendChild(deleteButton);  // Добавляем кнопку удаления к задаче
           taskList.appendChild(taskLine);
         }
       });
     }
+    
     function changeStatus(taskId) {
-      let newStatus = prompt('Choose a new status: new, resolved, unresolved, abandoned');
-      if (newStatus) {
-        fetch('http://127.0.0.1:8000/options/change_task', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-          },
-          body: JSON.stringify({ status: newStatus })
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Logic to update displayed data after status change
+      let statusOptions = ['new', 'resolved', 'unresolved', 'abandoned'];
+      let statusSelection = 'resolved'; // Выбор статуса происходит без поля ввода
+      if (statusOptions.includes(statusSelection)) {
+        let statusList = document.createElement('div');
+        statusOptions.forEach(option => {
+          let checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = option;
+          checkbox.id = option;
+          let label = document.createElement('label');
+          label.htmlFor = option;
+          label.appendChild(document.createTextNode(option));
+          statusList.appendChild(checkbox);
+          statusList.appendChild(label);
+          statusList.appendChild(document.createElement('br'));
         });
+        let confirmButton = document.createElement('button');
+        confirmButton.textContent = 'Подтвердить';
+        confirmButton.onclick = function() {
+          let selectedStatus = Array.from(statusList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+          if (selectedStatus.length > 0) {
+            fetch('http://127.0.0.1:8000/options/change_task', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({ id: taskId, status: selectedStatus[0] })
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Логика обновления отображаемых данных после изменения статуса
+            });
+            dialog.close(); // Закрыть диалоговое окно после подтверждения
+          } else {
+            alert('Пожалуйста, выберите статус.');
+          }
+        };
+        statusList.appendChild(confirmButton);
+    
+        // Создать диалоговое окно для отображения списка статусов
+        let dialog = document.createElement('dialog');
+        dialog.appendChild(statusList);
+        document.body.appendChild(dialog);
+        dialog.showModal();
+    
+        // Примечание: dialog.close() вызывается в обработчике события кнопки подтверждения
       }
     }
     
-  
-
-  function deleteTask(taskId) {
-    fetch('http://127.0.0.1:8000/options/delete_task', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken')
-      },
-      body: JSON.stringify({ taskId: taskId })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Logic to update displayed data after task deletion
-    });
-  }
+    function deleteTask(taskId) {
+      fetch('http://127.0.0.1:8000/options/delete_task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ taskId: taskId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Логика обновления отображаемых данных после удаления задачи
+      });
+    }
+    
 
     // Function to get the CSRF token from the cookie
     function getCookie(name) {
