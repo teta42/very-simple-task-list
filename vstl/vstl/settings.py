@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'vstl.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
+        'NAME': 'vstl_data',
         'USER': 'root',
         'PASSWORD': 'Wasd123!',
         'HOST': '127.0.0.1',  # Или адрес вашего сервера MySQL

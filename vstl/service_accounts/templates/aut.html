@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт Авторизации и Регистрации</title>
+</head>
+<body>
+    <h1>Сайт Авторизации</h1>
+    <form id="authorizationForm">
+        <div>
+            <label for="login">Логин:</label>
+            <input type="text" id="login" name="login">
+        </div>
+        <div>
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <button type="button" onclick="submitForm()">Отправить</button>
+    </form>
+
+    <p>Еще нет аккаунта? <a href="http://127.0.0.1:8000/account/registration/">Зарегистрируйтесь</a></p>
+
+    <script>
+        function submitForm() {
+            var loginValue = document.getElementById('login').value;
+            var passwordValue = document.getElementById('password').value;
+
+            if (loginValue && passwordValue) {
+                var data = {
+                    login: loginValue,
+                    password: passwordValue
+                };
+
+                fetch('http://127.0.0.1:8000/account/authorization/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        window.location.href = 'http://127.0.0.1:8000/';
+                    } else {
+                        console.log('Авторизация не удалась');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('Пожалуйста, заполните все поля.');
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

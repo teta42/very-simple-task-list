@@ -1,19 +1,25 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import json
 from list_task.models import Task
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.models import User
 
 def home(request):
-    return render(request, 'home.html')
+    if request.user.is_authenticated:
+        return render(request, 'home.html')
+    else:
+        return redirect('aut')
 
 def new_task(request):
     text = json.loads(request.body)['text']
-    new_task = Task(text=text, status='new')
+    user = User.objects.get(pk=request.user.id)
+    new_task = Task(text=text, status='new', user=user)
     new_task.save()
     return HttpResponse('ok')
 
 def list_task(request):
-    list_task = Task.objects.all()
+    user = User.objects.get(pk=request.user.id)
+    list_task = Task.objects.filter(user=user)
     records_dict = {}
     for record in list_task:
         records_dict[str(record.id)] = {

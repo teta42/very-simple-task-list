@@ -35,7 +35,7 @@
       .then(response => response.json())
       .then(data => {
         let taskList = document.getElementById('taskList');
-        let reversedKeys = Object.keys(data).reverse();  // Разворачиваем ключи
+        let reversedKeys = Object.keys(data).reverse();  // Reversing the keys
         for (let key of reversedKeys) {
           let task = data[key];
           let taskLine = document.createElement('div');
@@ -43,19 +43,40 @@
           let changeStatusButton = document.createElement('button');
           changeStatusButton.textContent = 'Change Status';
           changeStatusButton.onclick = function() {
-            changeStatus(key, task.id); // Передаем идентификатор задачи в функцию changeStatus
+            changeStatus(key, task.id); // Passing the task identifier to the changeStatus function
           };
-          let deleteButton = document.createElement('button');  // Создаем кнопку удаления
-          deleteButton.textContent = 'Delete';  // Текст кнопки
+          let deleteButton = document.createElement('button');  // Creating a delete button
+          deleteButton.textContent = 'Delete';  // Button text
           deleteButton.onclick = function() {
-            deleteTask(key, task.id);  // Вызываем функцию deleteTask с идентификатором задачи
+            deleteTask(key, task.id);  // Calling the deleteTask function with the task identifier
           };
           taskLine.appendChild(changeStatusButton);
-          taskLine.appendChild(deleteButton);  // Добавляем кнопку удаления к задаче
+          taskLine.appendChild(deleteButton);  // Adding the delete button to the task
           taskList.appendChild(taskLine);
         }
+        // Adding the 'Exit' button
+        let exitButton = document.createElement('button');
+        exitButton.textContent = 'Exit';
+        exitButton.style.position = 'absolute';
+        exitButton.style.top = '10px';
+        exitButton.style.right = '10px';
+        exitButton.onclick = function() {
+          fetch('http://127.0.0.1:8000/account/logout/', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'ok') {
+                window.location.href = 'http://127.0.0.1:8000/';
+              }
+            });
+        };
+        document.body.appendChild(exitButton);
       });
-    }
+    };
     
     function changeStatus(taskId) {
       let statusOptions = ['new', 'resolved', 'unresolved', 'abandoned'];
