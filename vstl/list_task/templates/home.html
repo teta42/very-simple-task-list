@@ -75,8 +75,42 @@
             });
         };
         document.body.appendChild(exitButton);
+        let newButton = document.createElement('button');
+        newButton.textContent = 'Удалить аккаунт';  // Текст кнопки
+        newButton.style.position = 'absolute';  // Позиционирование кнопки
+        newButton.style.top = '50%';  // Выравнивание по вертикали
+        newButton.style.right = '10px';  // Выравнивание по правому краю
+    
+        newButton.onclick = function() {
+          // Отправка POST-запроса
+          fetch('http://127.0.0.1:8000/account/delete/', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'ok') {
+              window.location.href = 'http://127.0.0.1:8000/';
+            }
+          });
+        };
+        document.body.appendChild(newButton);  // Добавление новой кнопки на страницу
+        
+        let changeAccountButton = document.createElement('button');
+        changeAccountButton.textContent = 'Изменить аккаунт';  // Текст кнопки
+        changeAccountButton.style.position = 'fixed';  // Позиционирование кнопки
+        changeAccountButton.style.bottom = '10px';  // Выравнивание по нижнему краю
+        changeAccountButton.style.right = '10px';  // Выравнивание по правому краю
+    
+        changeAccountButton.onclick = function() {
+          window.location.href = 'http://127.0.0.1:8000/account/change/';
+        };
+        document.body.appendChild(changeAccountButton);  // Добавление новой кнопки на страницу
       });
     };
+    
     
     function changeStatus(taskId) {
       let statusOptions = ['new', 'resolved', 'unresolved', 'abandoned'];
