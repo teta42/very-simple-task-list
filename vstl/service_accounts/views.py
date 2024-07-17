@@ -2,7 +2,9 @@ from django.shortcuts import render
 import json
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from service_accounts.models import Password_Blocker
 from django.contrib.auth import login, authenticate, logout
+from datetime import datetime, timedelta, timezone
 
 def registration(request):
     if request.method == 'GET':
@@ -36,14 +38,32 @@ def authorization(request):
         password = data['password']
         rememberMe = data['rememberMe']
         
-        user = authenticate(request, username=username, password=password)
+        user_is = User.objects.filter(username=username).count()
         
-        if user is not None:
-            login(request, user)
-            if rememberMe == False:
-                request.session.set_expiry(0)
-            return JsonResponse({"status": "ok"})
-        return JsonResponse({"status": "no_such_account_exists"})
+        if user_is == 1:
+            user = User.objects.get(username=username)
+            pb = Password_Blocker.objects.get(user=user.pk)
+            if datetime.now(timezone.utc) > pb.unlock_date:
+                if user.check_password(password):
+                    user = authenticate(request, username=username, password=password)
+                    login(request, user)
+                    if rememberMe == False:
+                        request.session.set_expiry(0)
+                    return JsonResponse({"status": "ok"})
+                else:
+                    if pb.incorrect_password_counter < 4:
+                        pb.incorrect_password_counter += 1
+                        pb.save()
+                        return JsonResponse({"status": "wrong_password"})
+                    elif pb.incorrect_password_counter > 4:
+                        pb.unlock_date = datetime.now(timezone.utc) + timedelta(hours=pb.next_blocking_for_how_long)
+                        pb.increase_next_lock(obj=user)
+                        pb.save()
+                        return JsonResponse({"status": "account_blocked", "unlocked": f"{pb.unlock_date-datetime.now(timezone.utc)}"})
+            else:
+                return JsonResponse({"status": "account_blocked", "unlocked": f"{pb.unlock_date-datetime.now(timezone.utc)}"})
+        else:
+            return JsonResponse({"status": "no_such_account_exists"})
 
 def change(request):
     if request.method == 'GET':
