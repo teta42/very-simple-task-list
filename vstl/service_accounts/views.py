@@ -12,13 +12,21 @@ def registration(request):
         password = data['password']
         username = data['login']
         email = data['email']
+        rememberMe = data['rememberMe']
         
-        user = User.objects.create_user(username=username, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({"status": "ok"})
-        return JsonResponse({"status": "not ok"})
-            
+        uniqueness = User.objects.filter(username=username).count()
+        
+        if uniqueness < 1: # Проверка уникальности "логина"
+            user = User.objects.create_user(username=username, email=email, password=password) # Регестрация пользователя
+            if user is not None:
+                login(request, user)
+                if rememberMe == False:
+                    request.session.set_expiry(0)
+                return JsonResponse({"status": "ok"})
+            return JsonResponse({"status": "not ok"})
+        else:
+            return JsonResponse({"status": "login_not_unique"})
+
 def authorization(request):
     if request.method == 'GET':
         return render(request, 'aut.html')
@@ -26,14 +34,17 @@ def authorization(request):
         data = json.loads(request.body)
         username = data['login']
         password = data['password']
+        rememberMe = data['rememberMe']
         
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
             login(request, user)
+            if rememberMe == False:
+                request.session.set_expiry(0)
             return JsonResponse({"status": "ok"})
         return JsonResponse({"status": "not ok"})
-    
+
 def change(request):
     if request.method == 'GET':
         return render(request, 'cha.html')
@@ -51,7 +62,6 @@ def change(request):
         login(request, user)
         return JsonResponse({"status": "ok"})
 
-        
 def delete(request):
     if request.user.is_authenticated:
         user = User.objects.get(pk=request.user.id)
