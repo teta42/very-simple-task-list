@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт Авторизации и Регистрации</title>
+    <title>Сайт Авторизации</title>
+    <style>
+        .error-message {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <h1>Сайт Авторизации</h1>
@@ -11,6 +16,7 @@
         <div>
             <label for="login">Логин:</label>
             <input type="text" id="login" name="login">
+            <span id="accountError" class="error-message" style="display: none;">Такого аккаунта не существует</span><br><br>
         </div>
         <div>
             <label for="password">Пароль:</label>
@@ -47,11 +53,12 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'ok') {
-                        window.location.href = 'http://127.0.0.1:8000/';
+                    if (data.status === 'no_such_account_exists') {
+                        document.getElementById('accountError').style.display = 'inline'; // Показать сообщение об ошибке
                     } else {
-                        console.log('Авторизация не удалась');
+                        document.getElementById('accountError').style.display = 'none'; // Скрыть сообщение об ошибке, если оно уже отображено
                     }
+                    console.log(data);
                 })
                 .catch(error => console.error('Error:', error));
             } else {

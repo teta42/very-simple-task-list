@@ -43,7 +43,7 @@ def authorization(request):
             if rememberMe == False:
                 request.session.set_expiry(0)
             return JsonResponse({"status": "ok"})
-        return JsonResponse({"status": "not ok"})
+        return JsonResponse({"status": "no_such_account_exists"})
 
 def change(request):
     if request.method == 'GET':
