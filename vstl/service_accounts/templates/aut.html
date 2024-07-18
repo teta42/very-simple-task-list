@@ -3,75 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт Авторизации</title>
+    <title>Форма авторизации</title>
     <style>
+        body {
+            font-family: 'K2D', sans-serif;
+            background-color: #E9E9E9; /* Светлая тема */
+            color: #1C1C1C;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .container h2 {
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-group input::placeholder {
+            color: #888;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .remember-me input {
+            margin-right: 10px;
+        }
+        .remember-me label {
+            margin: 0;
+        }
+        .remember-me.checked label {
+            text-decoration: line-through;
+        }
         .error-message {
             color: red;
+            font-size: 12px;
+            text-align: left;
+        }
+        button {
+            background-color: #1C1C1C;
+            color: #E9E9E9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        .link {
+            color: #1C1C1C;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .icons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .translate-icon, .theme-icon {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .bottom-square {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: #1C1C1C;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Сайт Авторизации</h1>
-    <form id="authorizationForm">
-        <div>
-            <label for="login">Логин:</label>
-            <input type="text" id="login" name="login">
-            <span id="accountError" class="error-message" style="display: none;">Такого аккаунта не существует</span><br><br>
+    <div class="container">
+        <h2>Авторизация</h2>
+        <div class="input-group">
+            <label for="login">Логин</label>
+            <input type="text" id="login" placeholder="Введите логин">
+            <div id="login-error" class="error-message"></div>
         </div>
-        <div>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password">
+        <div class="input-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль">
+            <div id="password-error" class="error-message"></div>
         </div>
-        <div>
-            <label for="rememberMe">Запомнить меня:</label>
-            <input type="checkbox" id="rememberMe" name="rememberMe" checked> <!-- Добавлен атрибут "checked" для установки значения по умолчанию -->
+        <div class="remember-me">
+            <input type="checkbox" id="remember-me">
+            <label for="remember-me">Запомнить меня</label>
         </div>
-        <button type="button" onclick="submitForm()">Отправить</button>
-    </form>
-
-    <p>Еще нет аккаунта? <a href="http://127.0.0.1:8000/account/registration/">Зарегистрируйтесь</a></p>
+        <button id="ok-button">ОК</button>
+        <div id="block-message" class="error-message"></div>
+        <p><a href="http://127.0.0.1:8000/account/registration/" id="registration-link" class="link">Регистрация</a></p>
+        <div class="icons">
+            <div class="translate-icon">🌐</div>
+            <div class="theme-icon">🌞</div>
+        </div>
+        <div class="bottom-square"></div>
+    </div>
 
     <script>
-        function submitForm() {
-            var loginValue = document.getElementById('login').value;
-            var passwordValue = document.getElementById('password').value;
+        document.getElementById('remember-me').addEventListener('change', function() {
+            document.querySelector('.remember-me').classList.toggle('checked', this.checked);
+        });
 
-            if (loginValue && passwordValue) {
-                var data = {
-                    login: loginValue,
-                    password: passwordValue,
-                    rememberMe: document.getElementById('rememberMe').checked // Добавлено получение состояния "Запомнить меня"
-                };
+        document.getElementById('ok-button').addEventListener('click', function() {
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            let valid = true;
 
+            if (!login) {
+                document.getElementById('login-error').textContent = 'Please fill in the fields';
+                valid = false;
+            } else {
+                document.getElementById('login-error').textContent = '';
+            }
+
+            if (!password) {
+                document.getElementById('password-error').textContent = 'Please fill in the fields';
+                valid = false;
+            } else {
+                document.getElementById('password-error').textContent = '';
+            }
+
+            if (valid) {
                 fetch('http://127.0.0.1:8000/account/authorization/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ login, password, rememberMe })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'no_such_account_exists') {
-                        document.getElementById('accountError').style.display = 'inline'; // Показать сообщение об ошибке
-                    } else {
-                        document.getElementById('accountError').style.display = 'none'; // Скрыть сообщение об ошибке, если оно уже отображено
+                    if (data.status === 'ok') {
+                        window.location.href = 'http://127.0.0.1:8000/';
+                    } else if (data.status === 'wrong_password') {
+                        document.getElementById('password-error').textContent = 'Incorrect password';
+                    } else if (data.status === 'account_blocked') {
+                        document.getElementById('block-message').textContent = `account is blocked, unlock via ${data.unlocked}`;
+                    } else if (data.status === 'no_such_account_exists') {
+                        document.getElementById('login-error').textContent = 'This account does not exist';
                     }
-                    console.log(data);
-                })
-                .catch(error => console.error('Error:', error));
-            } else {
-                alert('Пожалуйста, заполните все поля.');
+                });
             }
-        }
+        });
 
+        document.querySelector('.translate-icon').addEventListener('click', function() {
+            document.querySelector('h2').textContent = 'Авторизация';
+            document.querySelector('label[for="login"]').textContent = 'Логин';
+            document.querySelector('label[for="password"]').textContent = 'Пароль';
+            document.querySelector('label[for="remember-me"]').textContent = 'Запомнить меня';
+            document.getElementById('ok-button').textContent = 'ОК';
+            document.getElementById('registration-link').textContent = 'Регистрация';
+        });
+
+        document.querySelector('.theme-icon').addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            if (document.body.classList.contains('dark-theme')) {
+                document.body.style.backgroundColor = '#1C1C1C';
+                document.body.style.color = '#E9E9E9';
+                this.textContent = '🌜';
+            } else {
+                document.body.style.backgroundColor = '#E9E9E9';
+                document.body.style.color = '#1C1C1C';
+                this.textContent = '🌞';
+            }
+        });
+
+        document.querySelector('.bottom-square').addEventListener('mouseenter', function() {
+            window.location.href = 'https://youtu.be/dQw4w9WgXcQ?si=SM30PZ4malVQ1pbc';
+        });
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
                 const cookies = document.cookie.split(';');
                 for (let i = 0; i < cookies.length; i++) {
                     const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
                     if (cookie.substring(0, name.length + 1) === (name + '=')) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;
