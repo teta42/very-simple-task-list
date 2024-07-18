@@ -55,9 +55,10 @@ def authorization(request):
                         pb.incorrect_password_counter += 1
                         pb.save()
                         return JsonResponse({"status": "wrong_password"})
-                    elif pb.incorrect_password_counter > 4:
+                    elif pb.incorrect_password_counter >= 4:
                         pb.unlock_date = datetime.now(timezone.utc) + timedelta(hours=pb.next_blocking_for_how_long)
-                        pb.increase_next_lock(obj=user)
+                        pb.increase_next_lock()
+                        pb.incorrect_password_counter = 0
                         pb.save()
                         return JsonResponse({"status": "account_blocked", "unlocked": f"{pb.unlock_date-datetime.now(timezone.utc)}"})
             else:

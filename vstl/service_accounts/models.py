@@ -9,13 +9,13 @@ class Password_Blocker(models.Model):
     unlock_date = models.DateTimeField(default='2007-09-23 12:53:42.424242')
     next_blocking_for_how_long = models.IntegerField(default=24) # Указание времени для следующей блокировки в часах
     
-    def increase_next_lock(obj):
+    def increase_next_lock(self):
         rev = [24, 168, 720, 876000]
         for i in range(len(rev)):
-            if obj.next_blocking_for_how_long == rev[i]:
+            if self.next_blocking_for_how_long == rev[i]:
                 if i < 3:
-                    obj.next_blocking_for_how_long = rev[i+1]
-                    obj.save()
+                    self.next_blocking_for_how_long = rev[i+1]
+                    self.save()
     
 @receiver(post_save, sender=User)
 def create_or_update_password_blocker(sender, instance, created, **kwargs):
