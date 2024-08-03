@@ -16,6 +16,8 @@ class Password_Blocker(models.Model):
                 if i < 3:
                     self.next_blocking_for_how_long = rev[i+1]
                     self.save()
+    def __str__(self):
+        return self.user.username
     
 @receiver(post_save, sender=User)
 def create_or_update_password_blocker(sender, instance, created, **kwargs):

@@ -80,12 +80,12 @@ WSGI_APPLICATION = 'vstl.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'vstl_data',
-        'USER': 'root',
+        'USER': 'postgres',
         'PASSWORD': 'Wasd123!',
-        'HOST': '127.0.0.1',  # Или адрес вашего сервера MySQL
-        'PORT': '3306',  # Порт вашей базы данных, если отличается от стандартного
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
