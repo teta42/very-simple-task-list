@@ -19,7 +19,7 @@
     <label for="email">Email:</label>
     <input type="email" id="email" required><br><br>
     <label for="rememberMe">Запомнить меня:</label>
-    <input type="checkbox" id="rememberMe" name="rememberMe" checked><br><br> <!-- Добавлен атрибут "checked" для установки значения по умолчанию -->
+    <input type="checkbox" id="rememberMe" name="rememberMe" checked><br><br>
     <input type="button" value="Зарегистрироваться" onclick="submitRegistration()">
   </form>
 
@@ -48,10 +48,8 @@
         })
         .then(response => response.json())
         .then(data => {
-          if (data.status === "login_not_unique") {
-            document.getElementById('loginError').style.display = 'inline'; // Показать сообщение об ошибке
-          } else {
-            document.getElementById('loginError').style.display = 'none'; // Скрыть сообщение об ошибке, если оно уже отображено
+          if (data.status === "ok") {
+            window.location.href = "http://127.0.0.1:8000/";
           }
           console.log(data);
         })
@@ -66,7 +64,6 @@
             const cookies = document.cookie.split(';');
             for (let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
