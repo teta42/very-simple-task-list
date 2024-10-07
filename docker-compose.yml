@@ -16,7 +16,7 @@ services:
         ipv4_address: 172.25.0.2
   db:
     container_name: db
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_PASSWORD: "Wasd123!"
       POSTGRES_USER: "postgres"
