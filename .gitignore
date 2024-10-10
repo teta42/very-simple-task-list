@@ -8,6 +8,7 @@ __pycache__/
 
 # My
 postgres/data
+vstl/staticfiles
 
 # Distribution / packaging
 .Python
