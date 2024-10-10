@@ -84,7 +84,7 @@
         newButton.onclick = function() {
           // Отправка POST-запроса
           fetch('http://127.0.0.1:8000/account/delete/', {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
               'X-CSRFToken': getCookie('csrftoken')
             }
@@ -135,7 +135,7 @@
           let selectedStatus = Array.from(statusList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
           if (selectedStatus.length > 0) {
             fetch('http://127.0.0.1:8000/options/change_task', {
-              method: 'POST',
+              method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
@@ -165,7 +165,7 @@
     
     function deleteTask(taskId) {
       fetch('http://127.0.0.1:8000/options/delete_task', {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': getCookie('csrftoken')

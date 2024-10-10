@@ -69,17 +69,17 @@ def authorization(request):
 def change(request):
     if request.method == 'GET':
         return render(request, 'cha.html')
-    elif request.method == 'POST':
+    elif request.method == 'PUT':
         data = json.loads(request.body)
         password = data['password']
         username = data['login']
         
         user = User.objects.get(pk=request.user.id)
         if password is not None:
-            user.set_password(password)  # Corrected usage of set_password method
+            user.set_password(password)  # Соответствующий набор метода set_password
         if username is not None:
             user.username = username
-        user.save()  # Added parentheses to properly call the save method
+        user.save()
         login(request, user)
         return JsonResponse({"status": "ok"})
 
