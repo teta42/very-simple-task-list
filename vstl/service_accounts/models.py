@@ -19,6 +19,11 @@ class Password_Blocker(models.Model):
     def __str__(self):
         return self.user.username
     
+    class meta():
+        db_table = 'account_block'
+        verbose_name = 'Блокировка аккаунта'
+        verbose_name_plural = 'Блокировки аккаунтов'
+    
 @receiver(post_save, sender=User)
 def create_or_update_password_blocker(sender, instance, created, **kwargs):
     if created:

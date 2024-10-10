@@ -6,3 +6,8 @@ class Task(models.Model):
     text = models.TextField()
     status = models.CharField(max_length=13)
     date_creation = models.DateTimeField(auto_now_add=True)
+    
+    class meta():
+        db_table = 'Task'
+        verbose_name = 'Задача'
+        verbose_name_plural = 'Задачи'
