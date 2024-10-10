@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import json
 from list_task.models import Task
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 def home(request):
@@ -15,7 +15,7 @@ def new_task(request):
     user = User.objects.get(pk=request.user.id)
     new_task = Task(text=text, status='new', user=user)
     new_task.save()
-    return HttpResponse('ok')
+    return JsonResponse({"status": 'ok'})
 
 def list_task(request):
     user = User.objects.get(pk=request.user.id)
@@ -36,10 +36,10 @@ def change_task(request):
     task = Task.objects.get(id=id_task)
     task.status = new_status
     task.save()
-    return HttpResponse('ok')
+    return JsonResponse({"status": 'ok'})
 
 def delete_task(request):
     task_id = json.loads(request.body)['taskId']
     task = Task.objects.get(id=task_id)
     task.delete()
-    return HttpResponse('Задача удалена')
+    return JsonResponse({"status": 'ok'})
